@@ -22,6 +22,16 @@ void derivative(int, void*) {
 	cv::imshow("Alpha Blending", alpha_blend);
 }
 
+cv::Mat detected_edges, dst_canny;
+int lowThreshold = 0;
+void CannyThreshold(int, void*){
+	cv::blur(src, detected_edges, cv::Size(3, 3));
+	Canny(detected_edges, detected_edges, lowThreshold, lowThreshold*3, 3);
+	dst_canny = cv::Scalar::all(0);
+	src.copyTo(dst_canny, detected_edges);
+	imshow("Canny", dst_canny);
+}
+
 int main(){
 
 	src = cv::imread("..\\images\\Lenna.png", cv::IMREAD_GRAYSCALE);
@@ -32,6 +42,10 @@ int main(){
 		win_name, &kernel, 10, derivative);
 
 	cv::namedWindow("Alpha Blending", cv::WINDOW_AUTOSIZE);
+
+	cv::namedWindow("Canny", cv::WINDOW_AUTOSIZE);
+	cv::createTrackbar("Min Threshold:", "Canny", &lowThreshold, 80, CannyThreshold);
+	CannyThreshold(0, 0);
 
 	cv::waitKey();
 	cv::destroyAllWindows();
